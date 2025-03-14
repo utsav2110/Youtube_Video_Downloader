@@ -48,6 +48,7 @@
             font-weight: bold;
             unicode-bidi: isolate;
             font-size: large;
+            text-align: center;
         }
 
         form {
@@ -340,7 +341,7 @@
         </form>
         
         <div id="videoDetails" style="display:none;">
-            <h4 style="text-align: center;">Thumbnail:</h4>
+            <h4>Thumbnail:</h4>
             <img id="videoThumbnail" src="" alt="Video Thumbnail">
         </div>
     </div>
@@ -430,7 +431,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (!data.error && data.thumbnail) {
-                        document.getElementById("videoDetails").innerHTML = "<p>Thumbnail:</p><img id='videoThumbnail' src='" + data.thumbnail + "' alt='Video Thumbnail'>";
+                        document.getElementById("videoDetails").innerHTML = "<h4>Thumbnail:</h4><img id='videoThumbnail' src='" + data.thumbnail + "' alt='Video Thumbnail'>";
                         document.getElementById("videoDetails").style.display = "block";
                     } else {
                         document.getElementById("videoDetails").style.display = "none";
