@@ -231,6 +231,19 @@
             backdrop-filter: blur(5px);
             z-index: 999;
         }
+
+        @media only screen and (min-width:600px) {
+            .download-container {
+                display: flex;
+                flex-direction: row;
+                align-items: flex-start;
+                gap: 20px;
+                justify-content: center;
+            }
+            .download-container #videoDetails {
+                margin-top: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -275,22 +288,24 @@
         adjustGrid(); // Call on page load
     </script>
     
-    <form method="post" id="downloadForm">
-        {% csrf_token %}
-        <label for="url">Enter YouTube URL:</label><br>
-        <input type="text" id="url" name="url" required><br><br>
+    <div class="download-container">
+        <form method="post" id="downloadForm">
+            {% csrf_token %}
+            <label for="url">Enter YouTube URL:</label><br>
+            <input type="text" id="url" name="url" required><br><br>
+            
+            <label for="audio_only">Audio Only:</label>
+            <label class="switch">
+                <input type="checkbox" id="audio_only" name="audio_only">
+                <span class="slider"></span>
+            </label><br><br>
+            <input type="submit" value="Download Now">
+        </form>
         
-        <label for="audio_only">Audio Only:</label>
-        <label class="switch">
-            <input type="checkbox" id="audio_only" name="audio_only">
-            <span class="slider"></span>
-        </label><br><br>
-        <input type="submit" value="Download Now">
-    </form>
-    
-    <div id="videoDetails" style="display:none; margin-top:20px;">
-        <p>Thumbnail:</p>
-        <img id="videoThumbnail" src="" alt="Video Thumbnail">
+        <div id="videoDetails" style="display:none; margin-top:20px;">
+            <p>Thumbnail:</p>
+            <img id="videoThumbnail" src="" alt="Video Thumbnail">
+        </div>
     </div>
     
     <div class="progress-container" id="progressContainer">
