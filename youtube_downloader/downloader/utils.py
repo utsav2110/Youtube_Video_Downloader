@@ -33,6 +33,23 @@ def download_video(url, audio_only=False):
     else:
         ydl_opts["format"] = "best"
 
+    # Extract video info to compute filename.
+    with yt_dlp.YoutubeDL({}) as ydl_temp:
+        info = ydl_temp.extract_info(url, download=False)
+    title = info.get("title", "video")
+    
+    # Determine extension and download directory.
+    download_dir = os.path.join(os.path.expanduser("~"), "Downloads")
+    ext = "mp3" if audio_only else "mp4"
+    
+    # Build candidate filename and increment suffix if already exists.
+    candidate = os.path.join(download_dir, f"{title}.{ext}")
+    count = 0
+    while os.path.exists(candidate):
+        count += 1
+        candidate = os.path.join(download_dir, f"{title}{count}.{ext}")
+    ydl_opts["outtmpl"] = candidate
+
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
