@@ -215,12 +215,12 @@
             }
         }
 
-        .alert-popup {
+        {% comment %} .alert-popup {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(39, 174, 96, 0.95);
+            background: rgb(5, 255, 122);
             padding: 20px 30px;
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
@@ -258,8 +258,70 @@
         @keyframes popIn {
             0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
             100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
+        } {% endcomment %}
 
+        .alert-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #D4EDDA; /* Soft green background */
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: popIn 0.4s ease-out;
+            text-align: center;
+            width: 340px;
+        }
+        
+        .alert-popup h2 {
+            color: #155724; /* Dark green for heading */
+            margin: 0 0 10px;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .alert-popup p {
+            color: #333; /* Dark gray for readability */
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        
+        .alert-popup strong {
+            color: #007BFF; /* Blue color for emphasis */
+            font-weight: bold;
+        }
+        
+        .alert-popup .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #D9534F; /* Dark red close button */
+            font-size: 24px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .alert-popup .close-btn:hover {
+            color: #A94442; /* Darker red on hover */
+        }
+        
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }         
+        
         .backdrop {
             position: fixed;
             top: 0;
@@ -374,10 +436,22 @@
             const alert = document.createElement('div');
             alert.className = 'alert-popup';
             alert.innerHTML = `
+                {% comment %} <button class="close-btn">&times;</button>{% endcomment %}
+                {% comment %} <h2><i class="fas fa-check-circle"></i> Download Complete!</h2>
+                <p>Your file has been downloaded successfully in the Downloads Folder.</p>
+                <h2><i class="fas fa-check-circle" style="color: green;"></i> Download Complete!</h2>
+                <p>Your file has been downloaded successfully in the <strong style="color: blue;">📂 Downloads Folder</strong>.</p>
+                <p>Page will refresh in <span id="countdown" style="color:">${countdown}</span> seconds</p> {% endcomment %}
+             <div class="alert-popup">
                 <button class="close-btn">&times;</button>
                 <h2><i class="fas fa-check-circle"></i> Download Complete!</h2>
-                <p>Your file has been downloaded successfully.</p>
-                <p>Page will refresh in <span id="countdown">${countdown}</span> seconds</p>
+                <p>Your file has been downloaded successfully in the  
+                    <strong>📂 <span>Downloads Folder</span></strong>.
+                </p>
+                <p>Page will refresh in <span id="countdown" style="color:#DC3545;">${countdown}</span> seconds</p>
+            </div>
+
+
             `;
             document.body.appendChild(alert);
 
