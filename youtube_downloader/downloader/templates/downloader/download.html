@@ -39,6 +39,17 @@
             text-align: center; 
         }
 
+        h4 {
+            display: block;
+            margin-block-start: 0.66em;
+            margin-block-end: 0.33em;
+            margin-inline-start: 0px;
+            margin-inline-end: 0px;
+            font-weight: bold;
+            unicode-bidi: isolate;
+            font-size: large;
+        }
+
         form {
             background-color: #1e1e1e;
             padding: 30px;
@@ -46,6 +57,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             width: 300px;
             text-align: center;
+            margin-top: auto;
         }
 
         input[type="text"] {
@@ -176,6 +188,32 @@
             }
         }
         
+        @media only screen and (min-width:601px) and (max-width:739px) {
+            body {
+                padding: 15px;
+                height: auto;
+            }
+            h1 {
+                font-size: 32px;
+            }
+            form {
+                width: 90%;
+                padding: 20px;
+                margin: auto;
+            }
+            .progress-container {
+                width: 90%;
+            }
+            .download-container {
+                display: block;
+                text-align: center;
+            }
+            /* Optionally adjust grid layout */
+            #grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
         .alert-popup {
             position: fixed;
             top: 50%;
@@ -232,7 +270,7 @@
             z-index: 999;
         }
 
-        @media only screen and (min-width:600px) {
+        @media only screen and (min-width:740px) {
             .download-container {
                 display: flex;
                 flex-direction: row;
@@ -261,8 +299,8 @@
             grid-template-columns: repeat(6, 1fr);
         "
         id="grid-container">
-            <p>🎥 <span style="color:rgb(227, 238, 33);">HD Quality</span></p>
-            <p>📹 <span style="color: rgb(33, 235, 238);">MP4 Video</span></p>
+            <p>🎥 <span style="color:rgb(227, 238, 33);">HD Quality &nbsp;&nbsp;&nbsp; </span></p>
+            <p>📹 <span style="color: rgb(33, 235, 238);">MP4 Video &nbsp;&nbsp;</span></p>
             <p>✅ <span style="color: #27ae60;">No Ads</span></p>
             <p>🎉 <span style="color: #e74c3c;">Free</span></p>
             <p>⚡ <span style="color: #f39c12;">Fast</span></p>
@@ -274,10 +312,9 @@
         function adjustGrid() {
             let container = document.getElementById("grid-container");
             let width = window.innerWidth;
-    
             if (width >= 1024) {
                 container.style.gridTemplateColumns = "repeat(6, 1fr)";
-            } else if (width >= 600) {
+            } else if (width >= 700) {  // Changed condition: now width between 700 and 1024 uses 3 columns
                 container.style.gridTemplateColumns = "repeat(3, 1fr)";
             } else {
                 container.style.gridTemplateColumns = "repeat(2, 1fr)";
@@ -302,15 +339,18 @@
             <input type="submit" value="Download Now">
         </form>
         
-        <div id="videoDetails" style="display:none; margin-top:20px;">
-            <p>Thumbnail:</p>
+        <div id="videoDetails" style="display:none;">
+            <h4 style="text-align: center;">Thumbnail:</h4>
             <img id="videoThumbnail" src="" alt="Video Thumbnail">
         </div>
     </div>
     
     <div class="progress-container" id="progressContainer">
         <div class="progress-bar" id="progressBar"></div>
+        <br>
         <div class="progress-text" id="progressText">0%</</div>
+        <br>
+        <br>
     </div>
 
     {% if message %}
