@@ -1,8 +1,7 @@
-# Final code for mp3 and mp4 conversion
-
 import yt_dlp
 from django.core.cache import cache
-import os  
+import os
+import time
 from datetime import datetime
 
 CACHE_KEY = "download_progress"
@@ -14,22 +13,11 @@ def download_video(url, audio_only=False):
     ydl_opts = {
         "outtmpl": output_template,
         "progress_hooks": [progress_hook],
-        "postprocessor_args": [
-            '-metadata', f'date={current_date}',
-            '-metadata', f'creation_time={current_date}'
-        ],
     }
 
     if audio_only:
-        ydl_opts["format"] = "bestaudio/best"
-        ydl_opts["postprocessors"] = [
-            {
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "mp3",
-                "preferredquality": "192",
-            }
-        ]
-        ydl_opts["outtmpl"] = output_template.replace(".%(ext)s", ".mp3")  # Ensure output ends with .mp3
+        ydl_opts["format"] = "bestaudio[ext=webm]"  # Use WEBM instead of MP3
+        ydl_opts["outtmpl"] = output_template.replace(".%(ext)s", ".webm")  # Ensure WEBM extension
     else:
         ydl_opts["format"] = "best"
 
@@ -37,11 +25,11 @@ def download_video(url, audio_only=False):
     with yt_dlp.YoutubeDL({}) as ydl_temp:
         info = ydl_temp.extract_info(url, download=False)
     title = info.get("title", "video")
-    
+
     # Determine extension and download directory.
     download_dir = os.path.join(os.path.expanduser("~"), "Downloads")
-    ext = "mp3" if audio_only else "mp4"
-    
+    ext = "webm" if audio_only else "mp4"  # Change extension based on type
+
     # Build candidate filename and increment suffix if already exists.
     candidate = os.path.join(download_dir, f"{title}.{ext}")
     count = 0
@@ -53,6 +41,9 @@ def download_video(url, audio_only=False):
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
+        
+        update_file_timestamp(candidate)
+        
     except Exception as e:
         print(f"Error during download: {str(e)}")
 
@@ -63,3 +54,32 @@ def progress_hook(d):
     elif d["status"] == "finished":
         cache.set(CACHE_KEY, 100, timeout=60)
 
+
+def update_file_timestamp(file_path):
+    """Change the file's modification, creation (Windows), and access time to the current date."""
+    timestamp = time.time()  # Current timestamp
+
+    try:
+        # Update modification and access time (Linux/macOS/Windows)
+        os.utime(file_path, (timestamp, timestamp))
+
+        # Update creation time (Windows only)
+        if os.name == "nt":
+            import win32file, pywintypes
+            file_handle = win32file.CreateFile(
+                file_path,
+                win32file.GENERIC_WRITE,
+                win32file.FILE_SHARE_READ | win32file.FILE_SHARE_WRITE | win32file.FILE_SHARE_DELETE,
+                None,
+                win32file.OPEN_EXISTING,
+                0,
+                None,
+            )
+            new_time = pywintypes.Time(timestamp)
+            win32file.SetFileTime(file_handle, new_time, new_time, new_time)
+            file_handle.close()
+
+        print(f"Timestamps updated for {file_path}")
+    
+    except Exception as e:
+        print(f"Failed to update timestamps: {str(e)}")
