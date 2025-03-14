@@ -14,8 +14,9 @@
     <meta property="og:type" content="website">
     
     <!-- Favicon -->
-    <link rel="shortcut icon" href="{% static 'downloader/images/logo.png' %}" type="image/png">
-    
+    <link rel="shortcut icon" href="{% static 'downloader/images/logo-removebg-preview.png' %}" type="image/png">
+    {% comment %} <link rel="shortcut icon" href="{% static 'downloader/images/image.png' %}" type="image/png"> {% endcomment %}
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -59,18 +60,20 @@
         }
 
         input[type="submit"] {
-            background-color: #00bcd4;
+            background-color: green;
             color: #fff;
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 22px;
+            font-weight: bold;  /* Corrected from font-type */
+            font-family: "Poppins", sans-serif;  /* Change to any font you prefer */
             transition: background-color 0.3s;
         }
 
         input[type="submit"]:hover {
-            background-color: #0097a7;
+            background-color:rgba(79, 164, 26, 0.54);
         }
 
         .progress-container {
@@ -233,19 +236,46 @@
 </head>
 <body>
     <h1><i class="fa-brands fa-youtube" style="color: red;"></i> YouTube Video Downloader <i class="fa fa-download" style="color: #27ae60;"></i></h1>
-    
-    <div style="text-align: center; margin-bottom: 20px;">
-        <h3>Download your favorite YouTube videos in high quality</h3>
-        {% comment %} <p>✓   No Ads ✓   Free ✓     Fast ✓     Secure</p> {% endcomment %}
-        <p style="font-weight: bold; font-size: 18px; color: #333;">
-            ✅ <span style="color: #27ae60;">No Ads</span> &nbsp; |  
-            🎉 <span style="color: #e74c3c;">Free</span> &nbsp; |  
-            ⚡ <span style="color: #f39c12;">Fast</span> &nbsp; |  
-            🔒 <span style="color: #3498db;">Secure</span>
-        </p>
-        
-    </div>
 
+    <div style="display: grid; place-items: center; text-align: center; margin-bottom: 20px;">
+        <h3>Download your favorite YouTube videos in high quality</h3>
+        <div style="
+            display: grid; 
+            gap: 10px; 
+            text-align: center; 
+            font-weight: bold; 
+            font-size: 18px; 
+            color: #333;
+            grid-template-columns: repeat(6, 1fr);
+        "
+        id="grid-container">
+            <p>🎥 <span style="color:rgb(227, 238, 33);">HD Quality</span></p>
+            <p>📹 <span style="color: rgb(33, 235, 238);">MP4 Video</span></p>
+            <p>✅ <span style="color: #27ae60;">No Ads</span></p>
+            <p>🎉 <span style="color: #e74c3c;">Free</span></p>
+            <p>⚡ <span style="color: #f39c12;">Fast</span></p>
+            <p>🔒 <span style="color: #3498db;">Secure</span></p>
+        </div>
+    </div>
+    
+    <script>
+        function adjustGrid() {
+            let container = document.getElementById("grid-container");
+            let width = window.innerWidth;
+    
+            if (width >= 1024) {
+                container.style.gridTemplateColumns = "repeat(6, 1fr)";
+            } else if (width >= 600) {
+                container.style.gridTemplateColumns = "repeat(3, 1fr)";
+            } else {
+                container.style.gridTemplateColumns = "repeat(2, 1fr)";
+            }
+        }
+    
+        window.addEventListener("resize", adjustGrid);
+        adjustGrid(); // Call on page load
+    </script>
+    
     <form method="post" id="downloadForm">
         {% csrf_token %}
         <label for="url">Enter YouTube URL:</label><br>
@@ -256,7 +286,7 @@
             <input type="checkbox" id="audio_only" name="audio_only">
             <span class="slider"></span>
         </label><br><br>
-        <input type="submit" value="Download">
+        <input type="submit" value="Download Now">
     </form>
     
     <div id="videoDetails" style="display:none; margin-top:20px;">
