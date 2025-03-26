@@ -3,8 +3,16 @@ from django.core.cache import cache
 import os
 import time
 from datetime import datetime
+import re
 
 CACHE_KEY = "download_progress"
+
+def sanitize_filename(title):
+    sanitized = re.sub(r'[<>:"/\\|?*]', '_', title)
+    sanitized = re.sub(r'_+', '_', sanitized)
+    sanitized = sanitized.strip('. ')
+    sanitized = sanitized[:200]
+    return sanitized if sanitized else 'video'
 
 def download_video(url, audio_only=False):
     current_date = datetime.now().strftime("%Y%m%d")
@@ -26,16 +34,19 @@ def download_video(url, audio_only=False):
         info = ydl_temp.extract_info(url, download=False)
     title = info.get("title", "video")
 
+    # Sanitize the title for filename
+    safe_title = sanitize_filename(title)
+    
     # Determine extension and download directory.
     download_dir = os.path.join(os.path.expanduser("~"), "Downloads")
     ext = "webm" if audio_only else "mp4"  # Change extension based on type
 
     # Build candidate filename and increment suffix if already exists.
-    candidate = os.path.join(download_dir, f"{title}.{ext}")
+    candidate = os.path.join(download_dir, f"{safe_title}.{ext}")
     count = 0
     while os.path.exists(candidate):
         count += 1
-        candidate = os.path.join(download_dir, f"{title}{count}.{ext}")
+        candidate = os.path.join(download_dir, f"{safe_title}_{count}.{ext}")
     ydl_opts["outtmpl"] = candidate
 
     try:
