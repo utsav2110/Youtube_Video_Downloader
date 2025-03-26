@@ -35,12 +35,17 @@ This is a Django-based YouTube Video Downloader application.
    pip install -r requirements.txt
    ```
 
-2. Run migrations:
+2. Navigate to the project directory:
+   ```bash
+   cd youtube_downloader
+   ```
+    
+3. Run migrations:
    ```bash
    python manage.py migrate
    ```
 
-3. Start the development server:
+4. Start the development server:
    ```bash
    python manage.py runserver
    ```
