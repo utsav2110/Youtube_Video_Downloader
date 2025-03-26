@@ -15,10 +15,13 @@ def download_page(request):
         audio_only = True if request.POST.get("audio_only") == "on" else False
 
         if url:
+            cache.delete(CACHE_KEY)
+            cache.set(CACHE_KEY, 0)
             t = threading.Thread(target=download_video, args=(url, audio_only))
             t.start()
             return JsonResponse({"message": "Download started!"})
 
+    cache.delete(CACHE_KEY)
     return render(request, "downloader/download.html")
 
 
