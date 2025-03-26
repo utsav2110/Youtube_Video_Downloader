@@ -4,7 +4,7 @@ This is a Django-based YouTube Video Downloader application.
 
 ## Features
 - Download video from YouTube.
-- Convert YouTube videos to audio (MP3).
+- Convert YouTube videos to audio.
 - Download Audio Only from Youtube Video.
 - Progress tracking using Django's caching.
 
