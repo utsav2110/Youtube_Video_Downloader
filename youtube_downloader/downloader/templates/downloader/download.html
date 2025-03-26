@@ -197,6 +197,8 @@
                         clearInterval(progressInterval);
                         if (!countdownStarted) {
                             countdownStarted = true;
+                            // Trigger browser download
+                            window.location.href = '{% url "serve_file" %}';
                             let countdown = 10;
                             showCompleteAlert(countdown);
                             const countdownInterval = setInterval(() => {

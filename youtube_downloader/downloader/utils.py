@@ -14,9 +14,13 @@ def sanitize_filename(title):
     sanitized = sanitized[:200]
     return sanitized if sanitized else 'video'
 
-def download_video(url, audio_only=False):
+def download_video(url, audio_only=False, session_key=None):
     current_date = datetime.now().strftime("%Y%m%d")
-    output_template = os.path.join(os.path.expanduser("~"), "Downloads", "%(title)s.%(ext)s")
+    temp_dir = os.path.join(os.path.expanduser("~"), "Downloads", ".temp")
+    os.makedirs(temp_dir, exist_ok=True)
+    
+    # Use temp directory for initial download
+    output_template = os.path.join(temp_dir, "%(title)s.%(ext)s")
 
     ydl_opts = {
         "outtmpl": output_template,
@@ -24,39 +28,31 @@ def download_video(url, audio_only=False):
     }
 
     if audio_only:
-        ydl_opts["format"] = "bestaudio[ext=webm]"  # Use WEBM instead of MP3
-        ydl_opts["outtmpl"] = output_template.replace(".%(ext)s", ".webm")  # Ensure WEBM extension
+        ydl_opts["format"] = "bestaudio[ext=webm]"
+        ydl_opts["outtmpl"] = output_template.replace(".%(ext)s", ".webm")
     else:
         ydl_opts["format"] = "best"
 
-    # Extract video info to compute filename.
-    with yt_dlp.YoutubeDL({}) as ydl_temp:
-        info = ydl_temp.extract_info(url, download=False)
-    title = info.get("title", "video")
-
-    # Sanitize the title for filename
-    safe_title = sanitize_filename(title)
-    
-    # Determine extension and download directory.
-    download_dir = os.path.join(os.path.expanduser("~"), "Downloads")
-    ext = "webm" if audio_only else "mp4"  # Change extension based on type
-
-    # Build candidate filename and increment suffix if already exists.
-    candidate = os.path.join(download_dir, f"{safe_title}.{ext}")
-    count = 0
-    while os.path.exists(candidate):
-        count += 1
-        candidate = os.path.join(download_dir, f"{safe_title}_{count}.{ext}")
-    ydl_opts["outtmpl"] = candidate
-
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
+            info = ydl.extract_info(url, download=True)
+            
+        title = info.get("title", "video")
+        safe_title = sanitize_filename(title)
+        ext = "webm" if audio_only else "mp4"
         
-        update_file_timestamp(candidate)
+        # Get the path of the downloaded file
+        downloaded_file = os.path.join(temp_dir, f"{safe_title}.{ext}")
+        
+        # Store the file path in cache with session key
+        if session_key:
+            cache.set(f"download_path_{session_key}", downloaded_file, timeout=300)
+        
+        return downloaded_file
         
     except Exception as e:
         print(f"Error during download: {str(e)}")
+        return None
 
 def progress_hook(d):
     if d["status"] == "downloading":
