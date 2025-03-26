@@ -1,6 +1,5 @@
 import time
-import os
-from django.http import JsonResponse, FileResponse
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.core.cache import cache
 from .utils import download_video
@@ -18,14 +17,11 @@ def download_page(request):
         if url:
             cache.delete(CACHE_KEY)
             cache.set(CACHE_KEY, 0)
-            # Pass request.session.session_key to track the download
-            t = threading.Thread(target=download_video, args=(url, audio_only, request.session.session_key))
+            t = threading.Thread(target=download_video, args=(url, audio_only))
             t.start()
             return JsonResponse({"message": "Download started!"})
 
     cache.delete(CACHE_KEY)
-    if not request.session.session_key:
-        request.session.create()
     return render(request, "downloader/download.html")
 
 
@@ -50,22 +46,3 @@ def get_video_details(request):
         except Exception as e:
             return JsonResponse({"error": str(e)})
     return JsonResponse({"error": "No URL provided"})
-
-
-def serve_file(request):
-    """Serve the downloaded file through browser."""
-    session_key = request.session.session_key
-    if not session_key:
-        return JsonResponse({"error": "No session found"})
-    
-    filepath = cache.get(f"download_path_{session_key}")
-    if not filepath or not os.path.exists(filepath):
-        return JsonResponse({"error": "File not found"})
-
-    filename = os.path.basename(filepath)
-    response = FileResponse(
-        open(filepath, 'rb'),
-        as_attachment=True,
-        filename=filename
-    )
-    return response
